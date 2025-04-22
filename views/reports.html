@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan - Asisten Keuangan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment/locale/id.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-wallet text-blue-600 text-2xl mr-2"></i>
+                        <span class="font-bold text-xl text-gray-800">Asisten Keuangan</span>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="/" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Dashboard
+                        </a>
+                        <a href="/transactions" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Transaksi
+                        </a>
+                        <a href="/budgets" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Budget
+                        </a>
+                        <a href="/reports" class="border-blue-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Laporan
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="bg-blue-600 pb-32">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <h1 class="text-3xl font-bold text-white">Laporan Keuangan</h1>
+            <p class="mt-2 text-blue-100">Analisis detail keuangan dan tren pengeluaran Anda</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="-mt-32">
+        <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
+            <!-- Date Range Filter -->
+            <div class="bg-white rounded-lg shadow mb-8">
+                <div class="px-4 py-5 sm:p-6">
+                    <div class="flex flex-wrap gap-4 items-center">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-700">Periode:</label>
+                            <select id="dateRange" class="mt-1 block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                <option value="week">Minggu Ini</option>
+                                <option value="month" selected>Bulan Ini</option>
+                                <option value="quarter">3 Bulan Terakhir</option>
+                                <option value="year">Tahun Ini</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+                <!-- Total Income -->
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="rounded-md bg-green-500 p-3">
+                                    <i class="fas fa-arrow-down text-white"></i>
+                                </div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">
+                                        Total Pemasukan
+                                    </dt>
+                                    <dd class="text-lg font-semibold text-gray-900" id="totalIncome">
+                                        Rp0
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Expense -->
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="rounded-md bg-red-500 p-3">
+                                    <i class="fas fa-arrow-up text-white"></i>
+                                </div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">
+                                        Total Pengeluaran
+                                    </dt>
+                                    <dd class="text-lg font-semibold text-gray-900" id="totalExpense">
+                                        Rp0
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Balance -->
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="rounded-md bg-blue-500 p-3">
+                                    <i class="fas fa-wallet text-white"></i>
+                                </div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">
+                                        Saldo
+                                    </dt>
+                                    <dd class="text-lg font-semibold text-gray-900" id="balance">
+                                        Rp0
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Savings Rate -->
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="rounded-md bg-purple-500 p-3">
+                                    <i class="fas fa-piggy-bank text-white"></i>
+                                </div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">
+                                        Tingkat Tabungan
+                                    </dt>
+                                    <dd class="text-lg font-semibold text-gray-900" id="savingsRate">
+                                        0%
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                <!-- Income vs Expense Trend -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="px-4 py-5 sm:p-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                            Tren Pemasukan vs Pengeluaran
+                        </h3>
+                        <canvas id="trendChart" height="300"></canvas>
+                    </div>
+                </div>
+
+                <!-- Category Distribution -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="px-4 py-5 sm:p-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                            Distribusi Pengeluaran per Kategori
+                        </h3>
+                        <canvas id="categoryChart" height="300"></canvas>
+                    </div>
+                </div>
+
+                <!-- Daily Spending Pattern -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="px-4 py-5 sm:p-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                            Pola Pengeluaran Harian
+                        </h3>
+                        <canvas id="dailyChart" height="300"></canvas>
+                    </div>
+                </div>
+
+                <!-- Budget vs Actual -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="px-4 py-5 sm:p-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                            Budget vs Realisasi
+                        </h3>
+                        <canvas id="budgetChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Expenses -->
+            <div class="mt-8 bg-white rounded-lg shadow">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                        Top 5 Pengeluaran Terbesar
+                    </h3>
+                    <div class="flow-root">
+                        <ul id="topExpenses" class="-mb-8">
+                            <!-- Top expenses will be inserted here -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Insights -->
+            <div class="mt-8 bg-white rounded-lg shadow">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                        Insight Keuangan
+                    </h3>
+                    <div class="space-y-4" id="insights">
+                        <!-- Insights will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize moment.js locale
+        moment.locale('id');
+
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR'
+            }).format(amount);
+        }
+
+        // Chart colors
+        const chartColors = {
+            blue: '#3B82F6',
+            green: '#10B981',
+            red: '#EF4444',
+            yellow: '#F59E0B',
+            purple: '#8B5CF6',
+            pink: '#EC4899',
+            indigo: '#6366F1',
+            gray: '#6B7280'
+        };
+
+        // Initialize charts
+        let trendChart, categoryChart, dailyChart, budgetChart;
+
+        // Fetch and display report data
+        async function fetchReportData() {
+            const dateRange = document.getElementById('dateRange').value;
+            try {
+                const [transactions, budgets] = await Promise.all([
+                    fetch(`/api/transactions?range=${dateRange}`).then(res => res.json()),
+                    fetch('/api/budgets').then(res => res.json())
+                ]);
+
+                updateSummaryCards(transactions);
+                updateCharts(transactions, budgets);
+                updateTopExpenses(transactions);
+                generateInsights(transactions, budgets);
+            } catch (error) {
+                console.error('Error fetching report data:', error);
+            }
+        }
+
+        // Update summary cards
+        function updateSummaryCards(transactions) {
+            const income = transactions
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            const expense = transactions
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            const balance = income - expense;
+            const savingsRate = income > 0 ? ((income - expense) / income * 100).toFixed(1) : 0;
+
+            document.getElementById('totalIncome').textContent = formatCurrency(income);
+            document.getElementById('totalExpense').textContent = formatCurrency(expense);
+            document.getElementById('balance').textContent = formatCurrency(balance);
+            document.getElementById('savingsRate').textContent = `${savingsRate}%`;
+        }
+
+        // Update charts
+        function updateCharts(transactions, budgets) {
+            updateTrendChart(transactions);
+            updateCategoryChart(transactions);
+            updateDailyChart(transactions);
+            updateBudgetChart(transactions, budgets);
+        }
+
+        // Update trend chart
+        function updateTrendChart(transactions) {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            
+            const dailyData = transactions.reduce((acc, t) => {
+                const date = moment(t.timestamp).format('YYYY-MM-DD');
+                if (!acc[date]) {
+                    acc[date] = { income: 0, expense: 0 };
+                }
+                if (t.type === 'income') {
+                    acc[date].income += t.amount;
+                } else {
+                    acc[date].expense += t.amount;
+                }
+                return acc;
+            }, {});
+
+            const dates = Object.keys(dailyData).sort();
+            const incomeData = dates.map(date => dailyData[date].income);
+            const expenseData = dates.map(date => dailyData[date].expense);
+
+            if (trendChart) trendChart.destroy();
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates.map(date => moment(date).format('DD MMM')),
+                    datasets: [
+                        {
+                            label: 'Pemasukan',
+                            data: incomeData,
+                            borderColor: chartColors.green,
+                            backgroundColor: 'transparent',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Pengeluaran',
+                            data: expenseData,
+                            borderColor: chartColors.red,
+                            backgroundColor: 'transparent',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => formatCurrency(value)
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update category chart
+        function updateCategoryChart(transactions) {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            
+            const categoryData = transactions
+                .filter(t => t.type === 'expense')
+                .reduce((acc, t) => {
+                    acc[t.category] = (acc[t.category] || 0) + t.amount;
+                    return acc;
+                }, {});
+
+            const categories = Object.keys(categoryData);
+            const amounts = Object.values(categoryData);
+
+            if (categoryChart) categoryChart.destroy();
+            categoryChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        data: amounts,
+                        backgroundColor: Object.values(chartColors)
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update daily chart
+        function updateDailyChart(transactions) {
+            const ctx = document.getElementById('dailyChart').getContext('2d');
+            
+            const dailyAvg = Array(7).fill(0);
+            const counts = Array(7).fill(0);
+
+            transactions
+                .filter(t => t.type === 'expense')
+                .forEach(t => {
+                    const day = moment(t.timestamp).day();
+                    dailyAvg[day] += t.amount;
+                    counts[day]++;
+                });
+
+            for (let i = 0; i < 7; i++) {
+                if (counts[i] > 0) {
+                    dailyAvg[i] = dailyAvg[i] / counts[i];
+                }
+            }
+
+            if (dailyChart) dailyChart.destroy();
+            dailyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'],
+                    datasets: [{
+                        label: 'Rata-rata Pengeluaran Harian',
+                        data: dailyAvg,
+                        backgroundColor: chartColors.blue
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => formatCurrency(value)
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update budget chart
+        function updateBudgetChart(transactions, budgets) {
+            const ctx = document.getElementById('budgetChart').getContext('2d');
+            
+            const categoryExpenses = transactions
+                .filter(t => t.type === 'expense')
+                .reduce((acc, t) => {
+                    acc[t.category] = (acc[t.category] || 0) + t.amount;
+                    return acc;
+                }, {});
+
+            const categories = Object.keys(budgets);
+            const budgetAmounts = categories.map(c => budgets[c].limit);
+            const actualAmounts = categories.map(c => categoryExpenses[c] || 0);
+
+            if (budgetChart) budgetChart.destroy();
+            budgetChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: categories,
+                    datasets: [
+                        {
+                            label: 'Budget',
+                            data: budgetAmounts,
+                            backgroundColor: chartColors.blue
+                        },
+                        {
+                            label: 'Aktual',
+                            data: actualAmounts,
+                            backgroundColor: chartColors.red
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => formatCurrency(value)
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update top expenses
+        function updateTopExpenses(transactions) {
+            const topExpenses = transactions
+                .filter(t => t.type === 'expense')
+                .sort((a, b) => b.amount - a.amount)
+                .slice(0, 5);
+
+            const container = document.getElementById('topExpenses');
+            container.innerHTML = topExpenses.map((expense, index) => `
+                <li class="relative pb-8">
+                    ${index < 4 ? '<span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>' : ''}
+                    <div class="relative flex space-x-3">
+                        <div>
+                            <span class="h-8 w-8 rounded-full bg-gray-400 flex items-center justify-center ring-8 ring-white">
+                                <span class="text-white text-sm font-medium">${index + 1}</span>
+                            </span>
+                        </div>
+                        <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                            <div>
+                                <p class="text-sm text-gray-500">${expense.description}</p>
+                                <p class="mt-1 text-xs text-gray-400">${expense.category} • ${moment(expense.timestamp).format('DD MMM YYYY')}</p>
+                            </div>
+                            <div class="text-right text-sm whitespace-nowrap text-red-600 font-medium">
+                                ${formatCurrency(expense.amount)}
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        // Generate insights
+        function generateInsights(transactions, budgets) {
+            const insights = [];
+            
+            // Calculate monthly trends
+            const monthlyExpenses = transactions
+                .filter(t => t.type === 'expense')
+                .reduce((acc, t) => {
+                    const month = moment(t.timestamp).format('YYYY-MM');
+                    acc[month] = (acc[month] || 0) + t.amount;
+                    return acc;
+                }, {});
+
+            const months = Object.keys(monthlyExpenses).sort();
+            if (months.length >= 2) {
+                const lastMonth = monthlyExpenses[months[months.length - 1]];
+                const previousMonth = monthlyExpenses[months[months.length - 2]];
+                const change = ((lastMonth - previousMonth) / previousMonth * 100).toFixed(1);
+                
+                insights.push({
+                    icon: change > 0 ? 'arrow-up' : 'arrow-down',
+                    color: change > 0 ? 'red' : 'green',
+                    title: 'Tren Bulanan',
+                    description: `Pengeluaran bulan ini ${change > 0 ? 'naik' : 'turun'} ${Math.abs(change)}% dibanding bulan lalu`
+                });
+            }
+
+            // Check budget status
+            const overBudgetCategories = Object.entries(budgets)
+                .filter(([category, budget]) => {
+                    const spent = transactions
+                        .filter(t => t.type === 'expense' && t.category === category)
+                        .reduce((sum, t) => sum + t.amount, 0);
+                    return spent > budget.limit;
+                })
+                .map(([category]) => category);
+
+            if (overBudgetCategories.length > 0) {
+                insights.push({
+                    icon: 'exclamation-triangle',
+                    color: 'red',
+                    title: 'Peringatan Budget',
+                    description: `Budget terlampaui untuk kategori: ${overBudgetCategories.join(', ')}`
+                });
+            }
+
+            // Identify top spending category
+            const categoryExpenses = transactions
+                .filter(t => t.type === 'expense')
+                .reduce((acc, t) => {
+                    acc[t.category] = (acc[t.category] || 0) + t.amount;
+                    return acc;
+                }, {});
+
+            const topCategory = Object.entries(categoryExpenses)
+                .sort(([,a], [,b]) => b - a)[0];
+
+            if (topCategory) {
+                insights.push({
+                    icon: 'chart-pie',
+                    color: 'blue',
+                    title: 'Kategori Terbesar',
+                    description: `${topCategory[0]} adalah kategori dengan pengeluaran terbesar (${formatCurrency(topCategory[1])})`
+                });
+            }
+
+            // Calculate savings rate
+            const income = transactions
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            const expense = transactions
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            const savingsRate = income > 0 ? ((income - expense) / income * 100).toFixed(1) : 0;
+
+            insights.push({
+                icon: 'piggy-bank',
+                color: savingsRate >= 20 ? 'green' : 'yellow',
+                title: 'Tingkat Tabungan',
+                description: `Tingkat tabungan Anda ${savingsRate}% ${
+                    savingsRate >= 20 ? '(Bagus!)' : 
+                    savingsRate >= 10 ? '(Cukup)' : 
+                    '(Perlu ditingkatkan)'
+                }`
+            });
+
+            // Update insights in DOM
+            const container = document.getElementById('insights');
+            container.innerHTML = insights.map(insight => `
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <div class="rounded-md bg-${insight.color}-100 p-3">
+                            <i class="fas fa-${insight.icon} text-${insight.color}-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="text-lg font-medium text-gray-900">
+                            ${insight.title}
+                        </h4>
+                        <p class="mt-1 text-sm text-gray-500">
+                            ${insight.description}
+                        </p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Event listeners
+        document.getElementById('dateRange').addEventListener('change', fetchReportData);
+
+        // Initial load
+        fetchReportData();
+
+        // Refresh data every minute
+        setInterval(fetchReportData, 60000);
+    </script>
+</body>
+</html>
