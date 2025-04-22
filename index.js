@@ -1,5 +1,5 @@
 require('dotenv').config();
-const venom = require('venom-bot');
+const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const path = require('path');
 const express = require('express');
 const FinanceService = require('./src/services/financeService');
@@ -18,74 +18,51 @@ const PORT = process.env.PORT || 8000;
 app.use(express.static('public'));
 app.use(express.json());
 
-// Initialize WhatsApp bot
-async function initializeBot() {
-    try {
-        const client = await venom.create(
-            'finance-assistant',
-            (base64Qr, asciiQR, attempts, urlCode) => {
-                console.log('QR Code generated:', asciiQR);
-            },
-            (statusSession, session) => {
-                console.log('Status Session:', statusSession);
-            },
-            {
-                folderNameToken: process.env.SESSION_PATH,
-                mkdirFolderToken: true,
-                headless: true,
-                useChrome: false,
-                debug: false,
-                logQR: true,
-                browserArgs: ['--no-sandbox'],
-                multidevice: true,
-                disableWelcome: true,
-                createPathFileToken: true,
-            }
-        );
-
-        // Handle incoming messages
-        client.onMessage(async (message) => {
-            if (message.isGroupMsg) return; // Skip group messages
-
-            try {
-                const response = await messageHandler.handleMessage(message.body);
-                await client.sendText(message.from, response);
-                
-                // Reset monthly budgets if needed (check daily)
-                await budgetService.resetMonthlyBudgets();
-            } catch (error) {
-                console.error('Error handling message:', error);
-                await client.sendText(
-                    message.from,
-                    '❌ Maaf, terjadi kesalahan. Silakan coba lagi atau ketik "bantuan" untuk panduan.'
-                );
-            }
-        });
-
-        // Handle disconnections
-        client.onStateChange((state) => {
-            console.log('State changed:', state);
-            if (state === 'CONFLICT' || state === 'UNLAUNCHED') {
-                client.useHere();
-            }
-        });
-
-        // Handle client disconnection
-        client.onDisconnected((reason) => {
-            console.log('Client disconnected:', reason);
-            // Attempt to reconnect
-            initializeBot();
-        });
-
-        return client;
-    } catch (error) {
-        console.error('Error creating client:', error);
-        // Retry initialization after delay
-        setTimeout(initializeBot, 5000);
+// Initialize WhatsApp bot using whatsapp-web.js
+const client = new Client({
+    authStrategy: new LocalAuth({
+        dataPath: process.env.SESSION_PATH || 'tokens'
+    }),
+    puppeteer: {
+        headless: false,
+        args: []
     }
-}
+});
 
-// Web Dashboard Routes
+client.on('qr', (qr) => {
+    // Display QR code in console
+    console.log('QR RECEIVED', qr);
+    // Optionally, you can generate and display QR code image here
+});
+
+client.on('ready', () => {
+    console.log('WhatsApp client is ready!');
+});
+
+client.on('message', async (message) => {
+    if (message.from.includes('@g.us')) return; // Skip group messages
+
+    try {
+        const response = await messageHandler.handleMessage(message.body);
+        await client.sendMessage(message.from, response);
+
+        // Reset monthly budgets if needed (check daily)
+        await budgetService.resetMonthlyBudgets();
+    } catch (error) {
+        console.error('Error handling message:', error);
+        await client.sendMessage(
+            message.from,
+            '❌ Maaf, terjadi kesalahan. Silakan coba lagi atau ketik "bantuan" untuk panduan.'
+        );
+    }
+});
+
+client.on('disconnected', (reason) => {
+    console.log('Client was logged out:', reason);
+    client.initialize();
+});
+
+// Start the server
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
@@ -133,15 +110,9 @@ app.get('/api/reports/monthly', async (req, res) => {
     }
 });
 
-// Start the server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Dashboard available at http://localhost:${PORT}`);
 });
 
-// Initialize the WhatsApp bot
-initializeBot().then(() => {
-    console.log('WhatsApp bot initialized successfully');
-}).catch((error) => {
-    console.error('Failed to initialize WhatsApp bot:', error);
-});
+client.initialize();
