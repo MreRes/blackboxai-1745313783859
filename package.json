@@ -1,0 +1,23 @@
+{
+  "name": "whatsapp-finance-assistant",
+  "version": "1.0.0",
+  "description": "WhatsApp bot for personal finance management with reporting capabilities",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": ["whatsapp-bot", "finance", "venom-bot"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "venom-bot": "^5.0.21",
+    "express": "^4.18.2",
+    "dotenv": "^16.3.1",
+    "moment": "^2.29.4",
+    "lowdb": "^1.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
