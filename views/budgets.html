@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget - Asisten Keuangan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/moment/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment/locale/id.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-wallet text-blue-600 text-2xl mr-2"></i>
+                        <span class="font-bold text-xl text-gray-800">Asisten Keuangan</span>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="/" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Dashboard
+                        </a>
+                        <a href="/transactions" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Transaksi
+                        </a>
+                        <a href="/budgets" class="border-blue-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Budget
+                        </a>
+                        <a href="/reports" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Laporan
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="bg-blue-600 pb-32">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <h1 class="text-3xl font-bold text-white">Manajemen Budget</h1>
+            <p class="mt-2 text-blue-100">Atur dan pantau budget pengeluaran Anda</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="-mt-32">
+        <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
+            <!-- Budget Overview -->
+            <div class="bg-white rounded-lg shadow mb-8">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                        Overview Budget Bulan Ini
+                    </h3>
+                    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3" id="budgetOverview">
+                        <!-- Budget cards will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add/Edit Budget -->
+            <div class="bg-white rounded-lg shadow mb-8">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                        Tambah/Edit Budget
+                    </h3>
+                    <form id="budgetForm" class="space-y-4">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <label for="category" class="block text-sm font-medium text-gray-700">
+                                    Kategori
+                                </label>
+                                <div class="mt-1">
+                                    <input type="text" name="category" id="category" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="Contoh: Makanan, Transport">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="amount" class="block text-sm font-medium text-gray-700">
+                                    Jumlah Budget
+                                </label>
+                                <div class="mt-1">
+                                    <input type="number" name="amount" id="amount" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="Contoh: 2000000">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Simpan Budget
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Budget Details -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                        Detail Budget
+                    </h3>
+                    <div class="flex flex-col">
+                        <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                            <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                                <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Kategori
+                                                </th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Budget
+                                                </th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Terpakai
+                                                </th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Sisa
+                                                </th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Progress
+                                                </th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Status
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="budgetDetails" class="bg-white divide-y divide-gray-200">
+                                            <!-- Budget details will be inserted here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize moment.js locale
+        moment.locale('id');
+
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR'
+            }).format(amount);
+        }
+
+        // Fetch and display budgets
+        async function fetchBudgets() {
+            try {
+                const response = await fetch('/api/budgets');
+                const budgets = await response.json();
+                updateBudgetOverview(budgets);
+                updateBudgetDetails(budgets);
+            } catch (error) {
+                console.error('Error fetching budgets:', error);
+            }
+        }
+
+        // Update budget overview cards
+        function updateBudgetOverview(budgets) {
+            const overview = document.getElementById('budgetOverview');
+            overview.innerHTML = Object.entries(budgets).map(([category, budget]) => {
+                const percentage = Math.round(budget.percentage);
+                const statusColor = percentage >= 80 ? 'red' : percentage >= 50 ? 'yellow' : 'green';
+                const statusClass = `text-${statusColor}-600`;
+                const bgClass = `bg-${statusColor}-100`;
+
+                return `
+                    <div class="bg-white overflow-hidden shadow rounded-lg">
+                        <div class="p-5">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="relative">
+                                        <svg class="progress-ring" width="60" height="60">
+                                            <circle
+                                                stroke="#E5E7EB"
+                                                stroke-width="5"
+                                                fill="transparent"
+                                                r="25"
+                                                cx="30"
+                                                cy="30"
+                                            />
+                                            <circle
+                                                stroke="${statusColor === 'red' ? '#EF4444' : statusColor === 'yellow' ? '#F59E0B' : '#10B981'}"
+                                                stroke-width="5"
+                                                fill="transparent"
+                                                r="25"
+                                                cx="30"
+                                                cy="30"
+                                                stroke-dasharray="${2 * Math.PI * 25}"
+                                                stroke-dashoffset="${2 * Math.PI * 25 * (1 - percentage / 100)}"
+                                            />
+                                        </svg>
+                                        <div class="absolute inset-0 flex items-center justify-center">
+                                            <span class="text-sm font-semibold ${statusClass}">${percentage}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ml-5 w-0 flex-1">
+                                    <dl>
+                                        <dt class="text-sm font-medium text-gray-500 truncate">
+                                            ${category}
+                                        </dt>
+                                        <dd class="flex items-baseline">
+                                            <div class="text-2xl font-semibold text-gray-900">
+                                                ${formatCurrency(budget.used)}
+                                            </div>
+                                            <div class="ml-2 flex items-baseline text-sm font-semibold ${statusClass}">
+                                                dari ${formatCurrency(budget.limit)}
+                                            </div>
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update budget details table
+        function updateBudgetDetails(budgets) {
+            const details = document.getElementById('budgetDetails');
+            details.innerHTML = Object.entries(budgets).map(([category, budget]) => {
+                const percentage = Math.round(budget.percentage);
+                const statusColor = percentage >= 80 ? 'red' : percentage >= 50 ? 'yellow' : 'green';
+                const status = percentage >= 80 ? 'Kritis' : percentage >= 50 ? 'Perhatian' : 'Aman';
+
+                return `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            ${category}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${formatCurrency(budget.limit)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${formatCurrency(budget.used)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${formatCurrency(budget.remaining)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-${statusColor}-600 h-2.5 rounded-full" style="width: ${percentage}%"></div>
+                                </div>
+                                <span class="ml-2 text-sm text-gray-600">${percentage}%</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-${statusColor}-100 text-${statusColor}-800">
+                                ${status}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Handle budget form submission
+        document.getElementById('budgetForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const category = document.getElementById('category').value;
+            const amount = document.getElementById('amount').value;
+
+            if (!category || !amount) {
+                alert('Mohon isi semua field');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/budgets', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        category,
+                        amount: parseFloat(amount)
+                    }),
+                });
+
+                if (response.ok) {
+                    document.getElementById('category').value = '';
+                    document.getElementById('amount').value = '';
+                    fetchBudgets();
+                } else {
+                    alert('Gagal menyimpan budget');
+                }
+            } catch (error) {
+                console.error('Error saving budget:', error);
+                alert('Terjadi kesalahan');
+            }
+        });
+
+        // Initial load
+        fetchBudgets();
+
+        // Refresh data every minute
+        setInterval(fetchBudgets, 60000);
+    </script>
+</body>
+</html>
