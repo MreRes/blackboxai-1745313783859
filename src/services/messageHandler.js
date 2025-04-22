@@ -6,56 +6,71 @@ class MessageHandler {
         this.financeService = financeService;
         this.budgetService = budgetService;
     }
+async handleMessage(message) {
+    const text = message.toLowerCase().trim();
+    
+    try {
+        // Log all messages for debugging
+        console.log(`Received message: ${text}`);
 
-    async handleMessage(message) {
-        const text = message.toLowerCase().trim();
-        
-        try {
-            // Perintah Laporan
-            if (text === 'laporan' || text === 'report') {
-                return await this.handleDailyReport();
-            }
-            if (text === 'laporan bulanan' || text === 'monthly report') {
-                return await this.handleMonthlyReport();
-            }
-            if (text === 'laporan tahun ini' || text === 'yearly report') {
-                return await this.handleYearlyReport();
-            }
-            if (text === 'top pengeluaran' || text === 'top expenses') {
-                return await this.handleTopExpenses();
-            }
-
-            // Perintah Budget
-            if (text === 'status budget' || text === 'budget status') {
-                return await this.handleBudgetStatus();
-            }
-            if (text.startsWith('atur budget') || text.startsWith('set budget')) {
-                return await this.handleSetBudget(text);
-            }
-            if (text.startsWith('prediksi budget') || text.startsWith('predict budget')) {
-                return await this.handleBudgetPrediction();
-            }
-
-            // Perintah Transaksi
-            if (text.startsWith('catat pengeluaran') || text.startsWith('expense')) {
-                return await this.handleExpense(text);
-            }
-            if (text.startsWith('catat pemasukan') || text.startsWith('income')) {
-                return await this.handleIncome(text);
-            }
-
-            // Bantuan
-            if (text === 'bantuan' || text === 'help') {
-                return this.showHelp();
-            }
-
-            return this.showUnknownCommand();
-        } catch (error) {
-            console.error('Error handling message:', error);
-            return 'Maaf, terjadi kesalahan. Silakan coba lagi atau ketik "bantuan" untuk melihat panduan.';
+        // Perintah Laporan
+        if (text === 'laporan' || text === 'report') {
+            return await this.handleDailyReport();
         }
-    }
+        if (text === 'laporan harian' || text === 'daily report') {
+            return await this.handleDailyReport();
+        }
+        if (text.startsWith('laporan dari')) {
+            return await this.handleCustomReport(text);
+        }
+        if (text === 'laporan bulanan' || text === 'monthly report') {
+            return await this.handleMonthlyReport();
+        }
+        if (text === 'laporan tahun ini' || text === 'yearly report') {
+            return await this.handleYearlyReport();
+        }
+        if (text === 'top pengeluaran' || text === 'top expenses') {
+            return await this.handleTopExpenses();
+        }
 
+        // Perintah Budget
+        if (text === 'status budget' || text === 'budget status') {
+            return await this.handleBudgetStatus();
+        }
+        if (text.startsWith('atur budget') || text.startsWith('set budget')) {
+            return await this.handleSetBudget(text);
+        }
+        if (text.startsWith('prediksi budget') || text.startsWith('predict budget')) {
+            return await this.handleBudgetPrediction();
+        }
+
+        // Perintah Transaksi
+        if (text.startsWith('catat pengeluaran') || text.startsWith('expense')) {
+            return await this.handleExpense(text);
+        }
+        if (text.startsWith('catat pemasukan') || text.startsWith('income')) {
+            return await this.handleIncome(text);
+        }
+
+        // Perintah Riwayat Transaksi
+        if (text === 'riwayat transaksi' || text === 'history') {
+            return await this.handleTransactionHistory();
+        }
+        if (text.startsWith('riwayat transaksi dari')) {
+            return await this.handleTransactionHistoryCustom(text);
+        }
+
+        // Bantuan
+        if (text === 'bantuan' || text === 'help') {
+            return this.showHelp();
+        }
+
+        return this.showUnknownCommand();
+    } catch (error) {
+        console.error('Error handling message:', error);
+        return 'Maaf, terjadi kesalahan. Silakan coba lagi atau ketik "bantuan" untuk melihat panduan.';
+    }
+}
     async handleDailyReport() {
         const report = await this.financeService.getDailyReport();
         return this.financeService.formatReport(report);
