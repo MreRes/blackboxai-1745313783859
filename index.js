@@ -24,15 +24,28 @@ const client = new Client({
         dataPath: process.env.SESSION_PATH || 'tokens'
     }),
     puppeteer: {
-        headless: false,
-        args: []
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
     }
 });
 
+let latestQrCode = null;
+
 client.on('qr', (qr) => {
-    // Display QR code in console
     console.log('QR RECEIVED', qr);
-    // Optionally, you can generate and display QR code image here
+    latestQrCode = qr; // Save the latest QR code string
+});
+
+app.get('/api/qr', (req, res) => {
+    try {
+        if (latestQrCode) {
+            res.json({ qr: latestQrCode });
+        } else {
+            res.status(404).json({ error: 'QR code not available' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to get QR code' });
+    }
 });
 
 client.on('ready', () => {
