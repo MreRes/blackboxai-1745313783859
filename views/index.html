@@ -77,6 +77,12 @@
                     </div>
                 </div>
 
+                <!-- QR Code Card -->
+                <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6 flex flex-col items-center">
+                    <div class="mb-4 text-gray-700 font-medium">Scan QR Code WhatsApp untuk login:</div>
+                    <img id="qrCodeImage" alt="WhatsApp QR Code" class="w-64 h-64 border border-gray-300 rounded" />
+                </div>
+
                 <!-- Income Card -->
                 <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
                     <div class="flex items-center">
@@ -211,10 +217,11 @@
         // Fetch and display data
         async function fetchDashboardData() {
             try {
-                const [monthlyReport, budgets, transactions] = await Promise.all([
+                const [monthlyReport, budgets, transactions, qrData] = await Promise.all([
                     fetch('/api/reports/monthly').then(res => res.json()),
                     fetch('/api/budgets').then(res => res.json()),
-                    fetch('/api/transactions').then(res => res.json())
+                    fetch('/api/transactions').then(res => res.json()),
+                    fetch('/api/qr').then(res => res.json().catch(() => null))
                 ]);
 
                 // Update summary cards
@@ -227,6 +234,15 @@
                 const totalUsed = Object.values(budgets).reduce((sum, budget) => sum + budget.used, 0);
                 const usagePercentage = totalBudget > 0 ? (totalUsed / totalBudget * 100).toFixed(1) : 0;
                 document.getElementById('budgetUsage').textContent = `${usagePercentage}%`;
+
+                // Update QR code image if available
+                const qrImage = document.getElementById('qrCodeImage');
+                if (qrData && qrData.qr) {
+                    qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrData.qr)}&size=256x256`;
+                    qrImage.style.display = 'block';
+                } else {
+                    qrImage.style.display = 'none';
+                }
 
                 // Update charts
                 updateIncomeExpenseChart(monthlyReport);
