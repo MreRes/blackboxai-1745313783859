@@ -1,0 +1,25 @@
+<script>
+    async function fetchQrCode() {
+        try {
+            const response = await fetch('/api/qr');
+            if (response.ok) {
+                const data = await response.json();
+                if (data.qr) {
+                    document.getElementById('qrCodeImage').src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(data.qr)}&size=256x256`;
+                    document.getElementById('message').textContent = 'Silakan scan QR code dengan aplikasi WhatsApp Anda.';
+                } else {
+                    // No QR code means session exists, redirect to dashboard
+                    window.location.href = '/';
+                }
+            } else {
+                document.getElementById('message').textContent = 'QR code tidak tersedia.';
+            }
+        } catch (error) {
+            document.getElementById('message').textContent = 'Gagal memuat QR code.';
+            console.error('Error fetching QR code:', error);
+        }
+    }
+
+    fetchQrCode();
+    setInterval(fetchQrCode, 10000); // Refresh every 10 seconds
+</script>
