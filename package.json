@@ -7,15 +7,20 @@
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
-  "keywords": ["whatsapp-bot", "finance", "venom-bot"],
+  "keywords": [
+    "whatsapp-bot",
+    "finance",
+    "venom-bot"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "venom-bot": "^5.0.21",
-    "express": "^4.18.2",
     "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "lowdb": "^1.0.0",
     "moment": "^2.29.4",
-    "lowdb": "^1.0.0"
+    "venom-bot": "^5.0.21",
+    "whatsapp-web.js": "^1.27.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
