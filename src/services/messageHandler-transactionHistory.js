@@ -1,11 +1,19 @@
-async handleTransactionHistory() {
+const moment = require('moment');
+moment.locale('id');
+
+class MessageHandlerTransactionHistory {
+    constructor(financeService) {
+        this.financeService = financeService;
+    }
+
+    async handleTransactionHistory() {
         const report = await this.financeService.getDailyReport();
         return this.financeService.formatReport(report);
     }
 
     async handleTransactionHistoryCustom(text) {
-        // Format: riwayat transaksi dari [startDate] sampai [endDate]
-        const regex = /riwayat transaksi dari (\d{1,2}\/\d{1,2}\/\d{4}) sampai (\d{1,2}\/\d{1,2}\/\d{4})/;
+        // Format: riwayat transaksi dari (\\d{1,2}\\/\\d{1,2}\\/\\d{4}) sampai (\\d{1,2}\\/\\d{1,2}\\/\\d{4})
+        const regex = /riwayat transaksi dari (\\d{1,2}\\/\\d{1,2}\\/\\d{4}) sampai (\\d{1,2}\\/\\d{1,2}\\/\\d{4})/;
         const match = text.match(regex);
         if (!match) {
             return 'Format riwayat transaksi tidak valid. Contoh: riwayat transaksi dari 1/6/2023 sampai 30/6/2023';
@@ -21,6 +29,9 @@ async handleTransactionHistory() {
         response += `━━━━━━━━━━━━━━━━━━\n`;
         response += transactions.slice(0, 20).map(t =>
             `• ${t.type === 'expense' ? '🔴' : '🟢'} ${t.description}: ${this.financeService.formatCurrency(t.amount)}`
-        ).join('\n');
+        ).join('\\n');
         return response;
     }
+}
+
+module.exports = MessageHandlerTransactionHistory;
