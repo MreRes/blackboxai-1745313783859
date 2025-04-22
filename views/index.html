@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asisten Keuangan - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment/locale/id.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-wallet text-blue-600 text-2xl mr-2"></i>
+                        <span class="font-bold text-xl text-gray-800">Asisten Keuangan</span>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="/" class="border-blue-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Dashboard
+                        </a>
+                        <a href="/transactions" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Transaksi
+                        </a>
+                        <a href="/budgets" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Budget
+                        </a>
+                        <a href="/reports" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Laporan
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="bg-blue-600 pb-32">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <h1 class="text-3xl font-bold text-white">Dashboard Keuangan</h1>
+            <p class="mt-2 text-blue-100">Pantau dan kelola keuangan Anda dengan mudah</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="-mt-32">
+        <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <!-- Balance Card -->
+                <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                            <i class="fas fa-wallet text-white"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">
+                                    Saldo
+                                </dt>
+                                <dd class="text-lg font-semibold text-gray-900" id="totalBalance">
+                                    Rp0
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Income Card -->
+                <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
+                            <i class="fas fa-arrow-down text-white"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">
+                                    Pemasukan Bulan Ini
+                                </dt>
+                                <dd class="text-lg font-semibold text-gray-900" id="monthlyIncome">
+                                    Rp0
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expense Card -->
+                <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-red-500 rounded-md p-3">
+                            <i class="fas fa-arrow-up text-white"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">
+                                    Pengeluaran Bulan Ini
+                                </dt>
+                                <dd class="text-lg font-semibold text-gray-900" id="monthlyExpense">
+                                    Rp0
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Budget Status Card -->
+                <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-purple-500 rounded-md p-3">
+                            <i class="fas fa-chart-pie text-white"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">
+                                    Budget Terpakai
+                                </dt>
+                                <dd class="text-lg font-semibold text-gray-900" id="budgetUsage">
+                                    0%
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <!-- Income vs Expense Chart -->
+                <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                        Pemasukan vs Pengeluaran
+                    </h3>
+                    <canvas id="incomeExpenseChart" class="w-full" height="300"></canvas>
+                </div>
+
+                <!-- Category Expenses Chart -->
+                <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                        Pengeluaran per Kategori
+                    </h3>
+                    <canvas id="categoryChart" class="w-full" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="mt-8 bg-white rounded-lg shadow">
+                <div class="px-5 py-6 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        Transaksi Terakhir
+                    </h3>
+                    <div class="mt-4">
+                        <div class="flex flex-col">
+                            <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                                <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                                    <div class="overflow-hidden">
+                                        <table class="min-w-full divide-y divide-gray-200">
+                                            <thead class="bg-gray-50">
+                                                <tr>
+                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Tanggal
+                                                    </th>
+                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Deskripsi
+                                                    </th>
+                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Kategori
+                                                    </th>
+                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Jumlah
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="bg-white divide-y divide-gray-200" id="recentTransactions">
+                                                <!-- Transactions will be inserted here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize moment.js locale
+        moment.locale('id');
+
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR'
+            }).format(amount);
+        }
+
+        // Fetch and display data
+        async function fetchDashboardData() {
+            try {
+                const [monthlyReport, budgets, transactions] = await Promise.all([
+                    fetch('/api/reports/monthly').then(res => res.json()),
+                    fetch('/api/budgets').then(res => res.json()),
+                    fetch('/api/transactions').then(res => res.json())
+                ]);
+
+                // Update summary cards
+                document.getElementById('totalBalance').textContent = formatCurrency(monthlyReport.balance);
+                document.getElementById('monthlyIncome').textContent = formatCurrency(monthlyReport.income);
+                document.getElementById('monthlyExpense').textContent = formatCurrency(monthlyReport.expense);
+
+                // Calculate and update budget usage
+                const totalBudget = Object.values(budgets).reduce((sum, budget) => sum + budget.limit, 0);
+                const totalUsed = Object.values(budgets).reduce((sum, budget) => sum + budget.used, 0);
+                const usagePercentage = totalBudget > 0 ? (totalUsed / totalBudget * 100).toFixed(1) : 0;
+                document.getElementById('budgetUsage').textContent = `${usagePercentage}%`;
+
+                // Update charts
+                updateIncomeExpenseChart(monthlyReport);
+                updateCategoryChart(monthlyReport.categoryExpenses);
+
+                // Update recent transactions
+                updateRecentTransactions(transactions.slice(0, 5));
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error);
+            }
+        }
+
+        // Update Income vs Expense Chart
+        function updateIncomeExpenseChart(data) {
+            const ctx = document.getElementById('incomeExpenseChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Pemasukan', 'Pengeluaran'],
+                    datasets: [{
+                        data: [data.income, data.expense],
+                        backgroundColor: ['#10B981', '#EF4444']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => formatCurrency(value)
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update Category Chart
+        function updateCategoryChart(categoryExpenses) {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categoryExpenses),
+                    datasets: [{
+                        data: Object.values(categoryExpenses),
+                        backgroundColor: [
+                            '#3B82F6',
+                            '#10B981',
+                            '#F59E0B',
+                            '#EF4444',
+                            '#8B5CF6',
+                            '#EC4899'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update Recent Transactions Table
+        function updateRecentTransactions(transactions) {
+            const tbody = document.getElementById('recentTransactions');
+            tbody.innerHTML = transactions.map(t => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${moment(t.timestamp).format('DD MMM YYYY')}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${t.description}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${t.category}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}">
+                        ${t.type === 'income' ? '+' : '-'} ${formatCurrency(t.amount)}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Initial load
+        fetchDashboardData();
+
+        // Refresh data every minute
+        setInterval(fetchDashboardData, 60000);
+    </script>
+</body>
+</html>
